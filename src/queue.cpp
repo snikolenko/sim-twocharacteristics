@@ -43,7 +43,7 @@ template <typename T> void Queue<T>::init() {
 	}
 }
 
-template <typename T> void Queue<T>::increment_counters(int work, int length, int delay, int squared_delay) {
+template <typename T> void Queue<T>::increment_counters(int work, double length, int delay, int squared_delay) {
 	total_processed += use_value ? length : 1;
 	total_processed_length += length;
 	total_delay += delay;

@@ -93,7 +93,7 @@ public:
 	typename vector<Packet<T> >::iterator get_max_to_preempt();
 	virtual size_t size() const { return q.size(); }
 	double totallength() const;
-	void increment_counters(int work, int length, int delay, int squared_delay);
+	void increment_counters(int work, double length, int delay, int squared_delay);
 
 	void print_queue(string pref);
 
