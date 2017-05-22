@@ -104,17 +104,17 @@ void one_tick (int tick_num, PacketGenerator<int> * pg, vector<QueueContainer *>
 	}
 }
 
-void populate_policy_vector( vector<QueueContainer *> & v, uint k, uint min_B, uint max_B, uint B_step, uint min_C, uint max_C, uint min_L, uint max_L ) {
+void populate_policy_vector( vector<QueueContainer *> & v, uint k, uint min_B, uint max_B, uint B_step, uint min_C, uint max_C, uint min_L, uint max_L, double beta ) {
 	v.clear();
 	for (uint B = min_B; B <= max_B; B+=B_step ) {
 		for (uint C = min_C; C <= max_C; ++C ) {
 			for (uint L = min_L; L <= max_L; ++L ) {
 				D("Generating: " << k << "\t" << B << "\t" << C << "\t" << L);
-				v.push_back( new IntQueueContainer("FOPTUW", k, B, C, L, false) );
-				v.push_back( new IntQueueContainer("PQvalue", k, B, C, L, false) );
-				v.push_back( new IntQueueContainer("PQWork", k, B, C, L, false) );
-				v.push_back( new IntQueueContainer("PQVoverWV", k, B, C, L, false) );
-				v.push_back( new IntQueueContainer("PQVoverWW", k, B, C, L, false) );
+				v.push_back( new IntQueueContainer("FOPTUW", k, B, C, L, false, beta) );
+				v.push_back( new IntQueueContainer("PQvalue", k, B, C, L, false, beta) );
+				v.push_back( new IntQueueContainer("PQWork", k, B, C, L, false, beta) );
+				v.push_back( new IntQueueContainer("PQVoverWV", k, B, C, L, false, beta) );
+				v.push_back( new IntQueueContainer("PQVoverWW", k, B, C, L, false, beta) );
 			}
 		}
 	}
@@ -148,7 +148,7 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 
 	// populating vector of algorithms
 	vector<QueueContainer *> v;
-	populate_policy_vector(v, k, b_min, b_max, b_step, c_min, c_max, val, val);
+	populate_policy_vector(v, k, b_min, b_max, b_step, c_min, c_max, val, val, beta);
 
 	// main loop
 	for (int i=0; i < num_runs; ++i) {

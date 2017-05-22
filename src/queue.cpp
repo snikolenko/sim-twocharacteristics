@@ -29,7 +29,7 @@ template <typename T> void Queue<T>::init() {
 	}
 
 	// length-aware policies
-	if ( (type == "PQValue") || (type == "PQWork") || (type == "PQVoverW") || (type == "PQVoverWV") || (type == "PQVoverWW") ) {
+	if ( (type == "PQValue") || (type == "PQvalue") || (type == "PQWork") || (type == "PQVoverW") || (type == "PQVoverWV") || (type == "PQVoverWW") ) {
 		preempting = true;
 		sorting = true;
 		// lengthaware = true;
@@ -215,11 +215,22 @@ template <typename T> void Queue<T>::process_multiqueue(int tick_num) {
 
 template <typename T> void Queue<T>::add_packets( const vector<IntPacket> & v ) {
 	D("Adding " << v.size() << " packets");
+	double worst_priority = q.size() == 0 ? 0 : this->getPriority(q[q.size()-1]);
 	for ( vector<IntPacket>::const_iterator it = v.begin(); it != v.end(); ++it ) {
+		if (this->beta > 1 && this->B == this->q.size() && this->getPriority(*it) < worst_priority * this->beta ) {
+			D("\t skip packet " << *it << " due to beta=" << this->beta << " and worst priority " << worst_priority);
+			continue;
+		}
 		add_packet( *it, false );
 	}
 	if (sorting) {
+		#ifdef DEBUG
+			print_queue("Before sort: ");
+		#endif
 		doSort();
+		#ifdef DEBUG
+			print_queue("After sort: ");
+		#endif
 	}
 	if (preempting) {
 		#ifdef DEBUG
@@ -257,7 +268,7 @@ template <typename T> void Queue<T>::doSort() {
 	// 		sort(q.begin(), q.end());
 	// 	}
 	// } else {
-	if ( (type == "PQValue") || (type == "FOPTUW") ) {
+	if ( (type == "PQValue") || (type == "PQvalue") || (type == "FOPTUW") ) {
 		sort(q.begin(), q.end(), sortLength<T>);
 	}
 	else if ((type == "PQWork") || (type == "FOPTUL")) {
@@ -273,6 +284,18 @@ template <typename T> void Queue<T>::doSort() {
 		sort(q.begin(), q.end(), sortVoverWthenWork<T>);
 	}
 	// }
+}
+
+template <typename T> double Queue<T>::getPriority(const Packet<T> &p) {
+	if ( (type == "PQVoverW") || (type == "PQVoverWV") || (type == "PQVoverWW") ) {
+		return p.l / p.r;
+	}
+	else if ((type == "PQWork") || (type == "FOPTUL")) {
+		return 1. / p.r;
+	}
+	else {
+		return p.l;
+	}
 }
 
 template <typename T> typename vector<Packet<T> >::iterator Queue<T>::get_max_to_preempt() {
@@ -291,11 +314,10 @@ template <typename T> typename vector<Packet<T> >::iterator Queue<T>::get_max_to
 
 template <typename T> void Queue<T>::simple_add_packet( Packet<T> to_add, bool dosortifneeded ) {
 	// preemption for preempting policies is done later in bulk
-	bool wehavespace = preempting || (q.size() < B);
+	bool wehavespace = (q.size() < B);
 	if ( wehavespace ) {
 		this->total_admitted++;
 		q.push_back(to_add);
-		// if (dosortifneeded && sorting) doSort();
 	} else {
 		// preemption for length-aware policies is done in bulk
 		if (preempting && !lengthaware) {

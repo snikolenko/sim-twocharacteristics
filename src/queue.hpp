@@ -53,6 +53,12 @@ public:
 			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), random_pushout(false), use_value(false), sendingout(false) {
 		init();
 	}
+	Queue(string iType, uint ik, uint iB, uint iC, uint iL, bool iMultiqueue, double bt) : type(iType), B(iB), C(iC), L(iL), k(ik), beta(bt),
+			total_processed(0), total_processed_length(0), total_admitted(0), total_delay(0), total_squared_delay(0),
+			multiqueue(iMultiqueue), recycling(false), preempting(false), sorting(false), lengthaware(false),
+			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), random_pushout(false), use_value(false), sendingout(false) {
+		init();
+	}
 
 	string type;
 	size_t B;
@@ -106,6 +112,7 @@ public:
 	virtual void process(int tick_num);
 	void process_multiqueue(int tick_num);
 	void process_subqueue(int tick_num, int i);
+	double getPriority(const Packet<T> &p);
 	void doSort();
 	void init();
 	
@@ -284,6 +291,7 @@ public:
 	IntQueueContainer(string iType, uint ik, uint iB, uint iC, bool iMultiqueue) : q(iType, ik, iB, iC, iMultiqueue) {};
 	IntQueueContainer(string iType, uint ik, uint iB, uint iC, bool iMultiqueue, double bt) : q(iType, ik, iB, iC, iMultiqueue, bt) {};
 	IntQueueContainer(string iType, uint ik, uint iB, uint iC, uint iL, bool iMultiqueue) : q(iType, ik, iB, iC, iL, iMultiqueue) {};
+	IntQueueContainer(string iType, uint ik, uint iB, uint iC, uint iL, bool iMultiqueue, double bt) : q(iType, ik, iB, iC, iL, iMultiqueue, bt) {};
 
 	virtual const string & type() const { return q.type; }
 	virtual size_t B() const { 
