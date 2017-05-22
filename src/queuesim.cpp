@@ -137,6 +137,7 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 			pg->reset(k, val, large_lmb);
 		} else {
 			pg = (PacketGenerator<int>*)(new CAIDAPacketGenerator<int>(k, val, caida_infile, large_lmb));
+			caida_pg = pg;
 		}
 	} else {
 		if (twovalued_biased) {
