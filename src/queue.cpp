@@ -52,10 +52,12 @@ template <typename T> void Queue<T>::increment_counters(int work, double length,
 
 template <typename T> void Queue<T>::remove_head_packet(int tick_num) {
 	typename vector< Packet<T> >::iterator it = (this->reversing || this->use_value) ? (q.end()-1) : q.begin();
-	D("[" << tick_num << "]: processed " << (*it) << " adding " << (tick_num - it->arrival - (int)it->r + 1));
+	// D("[" << tick_num << "]: processed " << (*it) << " adding " << (tick_num - it->arrival - (int)it->r + 1));
+	D("[" << tick_num << "]: processed " << (*it));
 	int delay = tick_num - it->arrival - (this->use_value ? 0 : ((int)it->r + 1));
 	increment_counters(it->r, it->l, delay, delay * delay);
 	q.erase(it);
+	D(" total result " << total_processed_length);
 	if ( type != "FOPTUW" ) {
 		D(type << " processed a packet!\ntotal_proc=" << total_processed << "\ttotal_len=" << total_processed_length << "\ttotal_delay=" << total_delay << "\tlen_left=" << totallength());
 	}
@@ -224,18 +226,18 @@ template <typename T> void Queue<T>::add_packets( const vector<IntPacket> & v ) 
 		add_packet( *it, false );
 	}
 	if (sorting) {
-		#ifdef DEBUG
-			print_queue("Before sort: ");
-		#endif
+		// #ifdef DEBUG
+		// 	print_queue("Before sort: ");
+		// #endif
 		doSort();
-		#ifdef DEBUG
-			print_queue("After sort: ");
-		#endif
+		// #ifdef DEBUG
+		// 	print_queue("After sort: ");
+		// #endif
 	}
 	if (preempting) {
-		#ifdef DEBUG
-			print_queue("Before preempting: ");
-		#endif
+		// #ifdef DEBUG
+		// 	print_queue("Before preempting: ");
+		// #endif
 		if (lengthaware) {
 			int preempt_to = B-2*L+1;
 			if ( (type == "FOPTUL") || (type == "FOPTUW") ) preempt_to = B;
@@ -314,7 +316,7 @@ template <typename T> typename vector<Packet<T> >::iterator Queue<T>::get_max_to
 
 template <typename T> void Queue<T>::simple_add_packet( Packet<T> to_add, bool dosortifneeded ) {
 	// preemption for preempting policies is done later in bulk
-	bool wehavespace = (q.size() < B);
+	bool wehavespace = preempting || (q.size() < B);
 	if ( wehavespace ) {
 		this->total_admitted++;
 		q.push_back(to_add);
