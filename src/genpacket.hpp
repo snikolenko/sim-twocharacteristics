@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <random>
+#include <iostream>
+#include <fstream>
 #include <boost/random.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -22,8 +24,6 @@
 #include "packet.hpp"
 
 using namespace std;
-
-bool bernoulli( double prob );
 
 template <typename T> class PacketGenerator {
 public:
@@ -110,9 +110,6 @@ public:
 	boost::variate_generator<boost::mt19937&, boost::poisson_distribution<int, double> > rpois;
 };
 
-int get_random_int(int min, int max);
-
-
 template <typename T> class MMPPoissonPacketGenerator : public PacketGenerator<T> {
 public:
 	MMPPoissonPacketGenerator<T>( int ik, double swprob, double swbprob, double loff, double lon) : PacketGenerator<T>(ik),
@@ -188,7 +185,7 @@ public:
 		if (this->k > 1) {
 			int randint = get_random_int(1, this->k * (this->k + 1) / 2);
 			int cumul = this->k;
-			for (uint i=1; i<=this->k; ++i) {
+			for (int i=1; i<=this->k; ++i) {
 				if (randint <= cumul) {
 					kk = i; break;
 				}
@@ -260,6 +257,44 @@ public:
 	double lambda_off;
 	double lambda_on;
 	int nstreams;
+};
+
+
+
+template <typename T> class CAIDAPacketGenerator : public PacketGenerator<T> {
+public:
+	CAIDAPacketGenerator<T>( int k, int v, const string & caida_fname, double timeslot ) : PacketGenerator<T>(k),
+			timeslot_(timeslot), cur_time_(0.0), cur_pos_(0), k_(k), v_(v), caida_fname_(caida_fname), timestamps_() {
+		// read timestamps from file
+		ifstream ifs(caida_fname);
+		// cout << "Reading " << caida_fname << "..." << endl;
+		if (ifs.is_open()) {
+			string line;
+			while ( getline(ifs,line) ) {
+				if (line.size() > 10 && line[8] == '.') {
+					timestamps_.push_back(atof(line.substr(7, 8).data()));
+				}
+			}
+			ifs.close();
+		}
+		// cout << "Done! Read " << timestamps_.size() << " potential packets: " << timestamps_[0] << " " << timestamps_[1] << "..." << endl;
+		cur_time_ = timestamps_[0];
+	};
+
+	Packet<T> gen_packet() {
+		int k = (k_ == 1) ? 1 : get_random_int(1, k_);
+		int l = (v_ == 1) ? 1 : get_random_int(1, v_);
+		Packet<T> p = Packet<T>( k, l );
+		return p;
+	}
+
+	int gen_n_packets();
+
+	double timeslot_;
+	double cur_time_;
+	uint cur_pos_, k_, v_;
+	string caida_fname_;
+	vector<double> timestamps_;
 };
 
 

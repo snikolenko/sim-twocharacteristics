@@ -13,6 +13,9 @@
 
 using namespace std;
 
+bool bernoulli( double prob );
+int get_random_int(int min, int max);
+
 template <typename T> class Packet {
 public:
 	int arrival; // arrival time

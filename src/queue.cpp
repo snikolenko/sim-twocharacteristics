@@ -29,16 +29,17 @@ template <typename T> void Queue<T>::init() {
 	}
 
 	// length-aware policies
-	if ( (type == "PQValue") || (type == "PQWork") || (type == "PQVoverW") ) {
+	if ( (type == "PQValue") || (type == "PQWork") || (type == "PQVoverW") || (type == "PQVoverWV") || (type == "PQVoverWW") ) {
 		preempting = true;
 		sorting = true;
-		lengthaware = true;
+		// lengthaware = true;
 	}
 	if ( (type == "FOPTUL") || (type == "FOPTUW") ) {
 		preempting = true;
 		sorting = true;
-		lengthaware = true;
+		// lengthaware = true;
 		fractional = true;
+		B = B * L;
 	}
 }
 
@@ -104,7 +105,7 @@ template <typename T> void Queue<T>::process_head_packet(int tick_num) {
 	}
 }
 
-template <typename T> void Queue<T>::print_queue(string pref = "") {
+template <typename T> void Queue<T>::print_queue(string pref) {
 	if (multiqueue) {
 		D("Multiqueue state for " << type);
 		for (size_t i=0; i<k; ++i) {
@@ -220,46 +221,58 @@ template <typename T> void Queue<T>::add_packets( const vector<IntPacket> & v ) 
 	if (sorting) {
 		doSort();
 	}
-	if (lengthaware && preempting) {
+	if (preempting) {
 		#ifdef DEBUG
 			print_queue("Before preempting: ");
 		#endif
-		int preempt_to = B-2*L+1;
-		if ( (type == "FOPTUL") || (type == "FOPTUW") ) preempt_to = B;
-		D("Preempting to " << preempt_to << "\tB=" << B << " L=" << L);
-		// preemption for length-aware policies
-		double len = totallength();
-		while ( len > preempt_to + EPSILON ) {
-			len -= q[q.size()-1].l;
-			q.erase(q.begin()+(q.size()-1));
+		if (lengthaware) {
+			int preempt_to = B-2*L+1;
+			if ( (type == "FOPTUL") || (type == "FOPTUW") ) preempt_to = B;
+			D("Preempting to " << preempt_to << "\tB=" << B << " L=" << L);
+			// preemption for length-aware policies
+			double len = totallength();
+			// uint cur_remove_candidate = q.size() - 1;
+			while ( len > preempt_to + EPSILON ) {
+				len -= q[q.size()-1].l;
+				q.erase(q.begin()+(q.size()-1));
+			}
+		} else {
+			D("Preempting to B=" << B);
+			if (random_pushout) {
+				// bool do_remove = bernoulli(q[cur_remove_candidate].l);
+			} else {
+				while ( q.size() > B ) {
+					q.erase(q.begin()+(q.size()-1));
+				}
+			}
 		}
 	}
 }
 
 template <typename T> void Queue<T>::doSort() {
-	if (!lengthaware) {
-		if (use_value) {
-			sort(q.begin(), q.end(), sortLengthAsValue<T>);
-		} else {
-			sort(q.begin(), q.end());
-		}
-	} else {
-		if ( (type == "PQValue") || (type == "FOPTUW") ) {
-			sort(q.begin(), q.end(), sortLength<T>);
-		}
-		else if ((type == "PQWork") || (type == "FOPTUL")) {
-			sort(q.begin(), q.end(), sortWork<T>);
-		}
-		else if (type == "PQVoverW") {
-			sort(q.begin(), q.end(), sortValue<T>);
-		}
-		else if (type == "PQVoverWV") {
-			sort(q.begin(), q.end(), sortVoverWthenValue<T>);
-		}
-		else if (type == "PQVoverWW") {
-			sort(q.begin(), q.end(), sortVoverWthenWork<T>);
-		}
+	// if (!lengthaware) {
+	// 	if (use_value) {
+	// 		sort(q.begin(), q.end(), sortLengthAsValue<T>);
+	// 	} else {
+	// 		sort(q.begin(), q.end());
+	// 	}
+	// } else {
+	if ( (type == "PQValue") || (type == "FOPTUW") ) {
+		sort(q.begin(), q.end(), sortLength<T>);
 	}
+	else if ((type == "PQWork") || (type == "FOPTUL")) {
+		sort(q.begin(), q.end(), sortWork<T>);
+	}
+	else if (type == "PQVoverW") {
+		sort(q.begin(), q.end(), sortValue<T>);
+	}
+	else if (type == "PQVoverWV") {
+		sort(q.begin(), q.end(), sortVoverWthenValue<T>);
+	}
+	else if (type == "PQVoverWW") {
+		sort(q.begin(), q.end(), sortVoverWthenWork<T>);
+	}
+	// }
 }
 
 template <typename T> typename vector<Packet<T> >::iterator Queue<T>::get_max_to_preempt() {
@@ -277,12 +290,12 @@ template <typename T> typename vector<Packet<T> >::iterator Queue<T>::get_max_to
 }
 
 template <typename T> void Queue<T>::simple_add_packet( Packet<T> to_add, bool dosortifneeded ) {
-	// preemption for length-aware policies is done later in bulk
-	bool wehavespace = lengthaware || (q.size() < B);
+	// preemption for preempting policies is done later in bulk
+	bool wehavespace = preempting || (q.size() < B);
 	if ( wehavespace ) {
 		this->total_admitted++;
 		q.push_back(to_add);
-		if (dosortifneeded && sorting) doSort();
+		// if (dosortifneeded && sorting) doSort();
 	} else {
 		// preemption for length-aware policies is done in bulk
 		if (preempting && !lengthaware) {

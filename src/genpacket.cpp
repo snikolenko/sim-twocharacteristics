@@ -12,14 +12,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-bool bernoulli( double prob ) {
-	return ( ( rand() / (double)RAND_MAX ) < prob );
-}
-
-int get_random_int(int min, int max) {
-	return min + (rand() % (max-min+1));
-}
-
 template <typename T> vector<Packet<T> > MMPPUniformPacketGenerator<T>::internal_gen_packets() {
 	if ( bernoulli(switch_prob) ) on = !on;
 	D("gen_packets " << on);
@@ -54,13 +46,27 @@ template <typename T> int MMPPoissonPacketGenerator<T>::gen_n_packets() {
 	else return pg_off.gen_n_packets();
 }
 
+template <typename T> int CAIDAPacketGenerator<T>::gen_n_packets() {
+	cur_time_ = cur_time_ + timeslot_;
+	int res = 0;
+	while (timestamps_[cur_pos_] < cur_time_) {
+		res++;
+		cur_pos_++;
+		// wrap around so we don't run out of packets
+		if (cur_pos_ == timestamps_.size()) {
+			cur_pos_ = 0;
+			cur_time_ = cur_time_ - timestamps_[timestamps_.size() - 1];
+		}
+	}
+	return res;
+}
+
 template <typename T, typename L> vector<Packet<T> > MMPPVectorPoissonPacketGenerator<T, L>::internal_gen_packets() {
 	vector<Packet<T> > res;
 	for (typename vector<L *>::iterator it = v.begin(); it != v.end(); ++it) {
 		vector<Packet<T> > current_res = (*it)->internal_gen_packets();
 		res.insert(res.end(), current_res.begin(), current_res.end());
 	}
-	//cout << " " << res.size();
 	return res;
 }
 
@@ -71,3 +77,4 @@ template class MMPPVectorPoissonPacketGenerator<int, MMPPoissonTwoValuedBiasedPa
 template class MMPPVectorPoissonPacketGenerator<int, MMPPoissonTwoValuedUniformPacketGenerator<int> >;
 template class PoissonPacketGenerator<int>;
 template class PacketGenerator<int>;
+template class CAIDAPacketGenerator<int>;

@@ -38,19 +38,19 @@ public:
 	Queue(string iType, uint ik, uint iB, uint iC, bool iMultiqueue) : type(iType), B(iB), C(iC), L(1), k(ik), beta(1),
 			total_processed(0), total_processed_length(0), total_admitted(0), total_delay(0), total_squared_delay(0),
 			multiqueue(iMultiqueue), recycling(false), preempting(false), sorting(false), lengthaware(false),
-			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), use_value(false), sendingout(false) {
+			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), random_pushout(false), use_value(false), sendingout(false) {
 		init();
 	}
 	Queue(string iType, uint ik, uint iB, uint iC, bool iMultiqueue, double bt) : type(iType), B(iB), C(iC), L(1), k(ik), beta(bt),
 			total_processed(0), total_processed_length(0), total_admitted(0), total_delay(0), total_squared_delay(0),
 			multiqueue(iMultiqueue), recycling(false), preempting(false), sorting(false), lengthaware(false),
-			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), use_value(false), sendingout(false) {
+			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), random_pushout(false), use_value(false), sendingout(false) {
 		init();
 	}
 	Queue(string iType, uint ik, uint iB, uint iC, uint iL, bool iMultiqueue) : type(iType), B(iB), C(iC), L(iL), k(ik), beta(1),
 			total_processed(0), total_processed_length(0), total_admitted(0), total_delay(0), total_squared_delay(0),
 			multiqueue(iMultiqueue), recycling(false), preempting(false), sorting(false), lengthaware(false),
-			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), use_value(false), sendingout(false) {
+			fractional(false), lazy(false), reversing(false), leavepartiallyprocessed(false), random_pushout(false), use_value(false), sendingout(false) {
 		init();
 	}
 
@@ -77,6 +77,7 @@ public:
 	bool lazy;
 	bool reversing;
 	bool leavepartiallyprocessed;
+	bool random_pushout;
 
 	bool use_value;
 	bool sendingout;
