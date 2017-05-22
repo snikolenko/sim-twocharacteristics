@@ -171,7 +171,7 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 				"\tnum_streams=" << num_streams << endl;
 		// double max_total_length = v[0]->final_total_processed_length();
 		for (vector<QueueContainer *>::iterator it = v.begin(); it != v.end(); ++it) {
-			cout << (*it)->type().c_str() << "\tlambda=" << large_lmb << "\tk=" << (*it)->k() << "\tB=" << (*it)->B()
+			cout << (*it)->type().c_str() << "\tlambda=" << large_lmb << "\tk=" << (*it)->k() << "\tv=" << val << "\tB=" << (*it)->B()
 					<< "\tC=" << (*it)->C() << "\tbeta=" << std::setprecision(2) << (*it)->beta() << "\t"
 					<< (*it)->final_total_processed() << "\t"
 					<< int((*it)->final_total_processed_length()) << "\t"
