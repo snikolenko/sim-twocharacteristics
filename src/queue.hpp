@@ -18,7 +18,7 @@
 
 #include "packet.hpp"
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 	#define D(a) cout << a << endl
 #else
