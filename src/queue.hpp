@@ -286,7 +286,13 @@ public:
 	IntQueueContainer(string iType, uint ik, uint iB, uint iC, uint iL, bool iMultiqueue) : q(iType, ik, iB, iC, iL, iMultiqueue) {};
 
 	virtual const string & type() const { return q.type; }
-	virtual size_t B() const { return q.B; }
+	virtual size_t B() const { 
+		if ( (q.type == "FOPTUL") || (q.type == "FOPTUW") ) {
+			return (q.B / q.L);
+		} else {
+			return q.B;
+		}
+	}
 	virtual size_t C() const { return q.C; }
 	virtual size_t L() const { return q.L; }
 	virtual size_t k() const { return q.k; }
