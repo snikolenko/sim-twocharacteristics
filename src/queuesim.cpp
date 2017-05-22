@@ -85,7 +85,7 @@ void one_tick (int tick_num, PacketGenerator<int> * pg, vector<QueueContainer *>
 		p = pg->gen_packets();
 		for (vector<IntPacket>::iterator it = p.begin(); it != p.end(); ++it) {
 			it->setArrival(tick_num);
-			D((*it) << " ");
+			// D((*it) << " ");
 		}
 	}
 	for (vector<QueueContainer *>::iterator it = v.begin(); it != v.end(); ++it) {

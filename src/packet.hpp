@@ -50,8 +50,8 @@ template <typename T> ostream& operator<< (ostream& os, const Packet<T> & p) {
 	return os;
 }
 
-template <typename T> bool sortWork(const Packet<T> & i, const Packet<T> & j) { return (i.r<j.r); }
-template <typename T> bool sortLength(const Packet<T> & i, const Packet<T> & j) { return (i.l>j.l); }
+template <typename T> bool sortWork(const Packet<T> & i, const Packet<T> & j) { return ( (i.r<j.r) || ( (i.r == j.r) && (i.l > j.l) )); }
+template <typename T> bool sortLength(const Packet<T> & i, const Packet<T> & j) { return ( (i.l>j.l) || ( (i.l == j.l) && (i.r < j.r) )); }
 template <typename T> bool sortLengthAsValue(const Packet<T> & i, const Packet<T> & j) { return (i.l<j.l); }
 template <typename T> bool sortValue(const Packet<T> & i, const Packet<T> & j) { return ( (i.l / (float)i.r) > (j.l / (float)j.r)); }
 
