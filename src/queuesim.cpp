@@ -48,6 +48,7 @@ int default_firstcap = 1;
 double default_lmb = 0.25;
 
 string caida_infile = "";
+PacketGenerator<int>* caida_pg = NULL;
 
 // networking variables
 
@@ -131,7 +132,12 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 	// creating a generator
 	PacketGenerator<int> * pg;
 	if (caida_infile != "" && caida_infile != "None") {
-		pg = (PacketGenerator<int>*)(new CAIDAPacketGenerator<int>(k, val, caida_infile, large_lmb));
+		if (caida_pg != NULL) {
+			pg = caida_pg;
+			pg->reset(k, val, large_lmb);
+		} else {
+			pg = (PacketGenerator<int>*)(new CAIDAPacketGenerator<int>(k, val, caida_infile, large_lmb));
+		}
 	} else {
 		if (twovalued_biased) {
 			pg = (PacketGenerator<int>*)(new MMPPVectorPoissonPacketGenerator<int, MMPPoissonTwoValuedBiasedPacketGenerator<int> >(k, val, off_on_prob, on_off_prob, lmb, large_lmb, num_streams));

@@ -56,6 +56,8 @@ public:
 		return res;
 	}
 
+	virtual void reset(int k, int v, double timeslot) {}
+
 	virtual int gen_n_packets() {
 		return 0;
 	}
@@ -289,6 +291,13 @@ public:
 	}
 
 	int gen_n_packets();
+	void reset(int k, int v, double timeslot) {
+		k_ = k;
+		v_ = v;
+		timeslot_ = timeslot;
+		cur_pos_ = 0;
+		cur_time_ = 0;
+	}
 
 	double timeslot_;
 	double cur_time_;
