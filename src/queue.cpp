@@ -219,7 +219,7 @@ template <typename T> void Queue<T>::add_packets( const vector<IntPacket> & v ) 
 	D("Adding " << v.size() << " packets");
 	double worst_priority = q.size() == 0 ? 0 : this->getPriority(q[q.size()-1]);
 	for ( vector<IntPacket>::const_iterator it = v.begin(); it != v.end(); ++it ) {
-		if (this->beta > 1 && this->B == this->q.size() && this->getPriority(*it) < worst_priority * this->beta ) {
+		if (this->B <= this->q.size() && this->getPriority(*it) < worst_priority * this->beta ) {
 			D("\t skip packet " << *it << " due to beta=" << this->beta << " and worst priority " << worst_priority);
 			continue;
 		}

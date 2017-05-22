@@ -304,6 +304,7 @@ public:
 	uint cur_pos_, k_, v_;
 	string caida_fname_;
 	vector<double> timestamps_;
+	// vector<int> timestamps_;
 };
 
 
