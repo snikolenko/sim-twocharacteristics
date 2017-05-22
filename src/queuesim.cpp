@@ -194,6 +194,10 @@ int network_main() {
 	// double large_l_step = 10;
 	double large_l_start = 0.025;
 	double large_l_step = 0.01;
+	if (caida_infile != "" && caida_infile != "None") {
+		large_l_start = 0.00001;
+		large_l_step = 0.000005;
+	}
 
 	num_streams = 500;
 	off_on_prob = 0.01;
