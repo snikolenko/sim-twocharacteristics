@@ -188,6 +188,10 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 					<< std::setprecision(5) << sqrt((*it)->total_squared_delay()) / (double)(*it)->total_processed()
 					<< endl;
 		}
+
+		for (vector<QueueContainer *>::iterator it = v.begin(); it != v.end(); ++it) {
+			delete *it;
+		}
 	}
 }
 

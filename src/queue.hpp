@@ -265,6 +265,7 @@ template <typename T> struct t_compare_queues_by_length {
 
 class QueueContainer {
 public:
+	virtual ~QueueContainer() {};
 	virtual const string & type() const = 0;
 	virtual size_t B() const = 0;
 	virtual size_t C() const = 0;
