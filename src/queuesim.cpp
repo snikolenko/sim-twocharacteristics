@@ -224,10 +224,12 @@ int network_main() {
 		if (total_l == 1) large_lmb = default_lmb;
 		for ( int k=k_min; k <= k_max; k += k_step ) {
 			for ( int v=min_maxval; v <= max_maxval; v += step_maxval ) {
+				for ( int b=b_min; b <= b_max; b += b_step ) {
 			// num_streams = k * max_length;
 			// large_lmb = (large_l_start + l * large_l_step) / (double)num_streams;
-				D("Experiment: k=" << k << "\tv=" << v << "\tb_min=" << b_min << "\tb_max=" << b_max << "\tb_step=" << b_step << "\tbeta=" << beta << "\truns=" << SIM_SIZE);
-				network_runsim(k, v, b_min, b_max, b_step, c_min, c_max, beta, SIM_SIZE);
+					D("Experiment: k=" << k << "\tv=" << v << "\tb_min=" << b_min << "\tb_max=" << b_max << "\tb_step=" << b_step << "\tbeta=" << beta << "\truns=" << SIM_SIZE);
+					network_runsim(k, v, b, b, b_step, c_min, c_max, beta, SIM_SIZE);
+				}
 			}
 		}
 	}
