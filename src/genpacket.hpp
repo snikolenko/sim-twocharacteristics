@@ -336,8 +336,12 @@ public:
 	}
 
 	Packet<T> gen_packet() {
-		int k = 1 + get_random_int(0, 1) * k_;
+		// int k = 1 + get_random_int(0, 1) * k_;
+		int k = (k_ == 1) ? 1 : get_random_int(1, k_);
 		int v = 1 + get_random_int(0, 1) * v_;
+		// int r = get_random_int(0, 1);
+		// int k = 1 + r * k_;
+		// int v = 1 + r * v_;
 		Packet<T> p = Packet<T>( k, v );
 		return p;
 	}
