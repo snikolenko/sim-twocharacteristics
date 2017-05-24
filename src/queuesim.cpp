@@ -136,7 +136,11 @@ void network_runsim(int k, int val, int b_min, int b_max, int b_step, int c_min,
 			pg = caida_pg;
 			pg->reset(k, val, large_lmb);
 		} else {
-			pg = (PacketGenerator<int>*)(new CAIDAPacketGenerator<int>(k, val, caida_infile, large_lmb));
+			if (twovalued_uniform) {
+				pg = (PacketGenerator<int>*)(new CAIDAPacketGeneratorTwoVal<int>(k, val, caida_infile, large_lmb));
+			} else {
+				pg = (PacketGenerator<int>*)(new CAIDAPacketGenerator<int>(k, val, caida_infile, large_lmb));
+			}
 			caida_pg = pg;
 		}
 	} else {

@@ -266,7 +266,11 @@ public:
 template <typename T> class CAIDAPacketGenerator : public PacketGenerator<T> {
 public:
 	CAIDAPacketGenerator<T>( int k, int v, const string & caida_fname, double timeslot ) : PacketGenerator<T>(k),
-			timeslot_(timeslot), cur_time_(0.0), cur_pos_(0), k_(k), v_(v), caida_fname_(caida_fname), timestamps_() {
+			timeslot_(timeslot), cur_time_(0.0), cur_pos_(0), k_(k), v_(v), timestamps_() {
+		init_caida(caida_fname);
+	};
+
+	void init_caida(const string & caida_fname) {
 		// read timestamps from file
 		ifstream ifs(caida_fname);
 		// cout << "Reading " << caida_fname << "..." << endl;
@@ -280,8 +284,8 @@ public:
 			ifs.close();
 		}
 		// cout << "Done! Read " << timestamps_.size() << " potential packets: " << timestamps_[0] << " " << timestamps_[1] << "..." << endl;
-		cur_time_ = timestamps_[0];
-	};
+		cur_time_ = timestamps_[0];		
+	}
 
 	Packet<T> gen_packet() {
 		int k = (k_ == 1) ? 1 : get_random_int(1, k_);
@@ -302,7 +306,54 @@ public:
 	double timeslot_;
 	double cur_time_;
 	uint cur_pos_, k_, v_;
-	string caida_fname_;
+	vector<double> timestamps_;
+	// vector<int> timestamps_;
+};
+
+
+template <typename T> class CAIDAPacketGeneratorTwoVal : public PacketGenerator<T> {
+public:
+	CAIDAPacketGeneratorTwoVal<T>( int k, int v, const string & caida_fname, double timeslot ) : PacketGenerator<T>(k),
+			timeslot_(timeslot), cur_time_(0.0), cur_pos_(0), k_(k), v_(v), timestamps_() {
+		init_caida(caida_fname);
+	};
+
+	void init_caida(const string & caida_fname) {
+		// read timestamps from file
+		ifstream ifs(caida_fname);
+		// cout << "Reading " << caida_fname << "..." << endl;
+		if (ifs.is_open()) {
+			string line;
+			while ( getline(ifs,line) ) {
+				if (line.size() > 10 && line[8] == '.') {
+					timestamps_.push_back(atof(line.substr(7, 8).data()));
+				}
+			}
+			ifs.close();
+		}
+		// cout << "Done! Read " << timestamps_.size() << " potential packets: " << timestamps_[0] << " " << timestamps_[1] << "..." << endl;
+		cur_time_ = timestamps_[0];		
+	}
+
+	Packet<T> gen_packet() {
+		int k = 1 + get_random_int(0, 1) * k_;
+		int v = 1 + get_random_int(0, 1) * v_;
+		Packet<T> p = Packet<T>( k, v );
+		return p;
+	}
+
+	int gen_n_packets();
+	void reset(int k, int v, double timeslot) {
+		k_ = k;
+		v_ = v;
+		timeslot_ = timeslot;
+		cur_pos_ = 0;
+		cur_time_ = 0;
+	}
+
+	double timeslot_;
+	double cur_time_;
+	uint cur_pos_, k_, v_;
 	vector<double> timestamps_;
 	// vector<int> timestamps_;
 };
